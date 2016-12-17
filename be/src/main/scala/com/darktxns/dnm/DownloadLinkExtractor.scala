@@ -1,4 +1,4 @@
-package com.darktxns.archiveOrg
+package com.darktxns.dnm
 
 import java.util.concurrent.Callable
 
