@@ -12,7 +12,7 @@ object Main
 
         println("Starting download..")
 
-        val toDl = links.find(l => l.fileName == "zanzibarspice.tar.xz").get
+        val toDl = links.find(_.fileName == "zanzibarspice.tar.xz").get
 
         val dest = new Downloader(toDl).call()
 
