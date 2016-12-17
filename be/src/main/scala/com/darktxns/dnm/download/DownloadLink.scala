@@ -1,5 +1,6 @@
-package com.darktxns.dnm
+package com.darktxns.dnm.download
 
+import com.darktxns.dnm.DatasetType
 import com.darktxns.dnm.DatasetType.DatasetType
 
 object DownloadLink

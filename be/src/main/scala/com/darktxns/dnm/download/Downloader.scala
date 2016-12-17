@@ -1,4 +1,4 @@
-package com.darktxns.dnm
+package com.darktxns.dnm.download
 
 import java.io.File
 import java.net.URL

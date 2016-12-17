@@ -1,6 +1,6 @@
 package com.darktxns
 
-import com.darktxns.dnm.{DownloadLinkExtractor, Downloader}
+import com.darktxns.dnm.download.{DownloadLinkExtractor, Downloader}
 import com.darktxns.io.Reader
 
 object Main
