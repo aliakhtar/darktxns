@@ -4,6 +4,8 @@ import com.darktxns.dnm.DatasetType.DatasetType
 
 object DownloadLink
 {
+    /* The parsed links are just the file names, they are appended to the below dir to get the full download URL */
+
     val DOWNLOAD_DIR = "https://archive.org/download/dnmarchives/"
     val EXTENSION = ".tar.xz"
 }
@@ -17,8 +19,8 @@ class DownloadLink(val fileName: String)
 
     private def parseMarketName(fileName:String):String =
     {
-        if (fileName == "2015-sr2doug-claimedsr2leaks.tar.xz")
-            return "SilkRoad2"
+        if (fileName == "2015-sr2doug-claimedsr2leaks.tar.xz") //This dataset is named inconsistently from others,
+            return "SilkRoad2"                                 // hence needs its own exception
 
         val processed = fileName
             .trim
@@ -33,6 +35,9 @@ class DownloadLink(val fileName: String)
         processed.splitAt( processed.indexOf("-") )._1
     }
 
+    /**
+      * If the filename contains -forum , consider it a forum dataset, otherwise, market
+      */
     private def parseType(fileName:String):DatasetType =
     {
         if (! fileName.toLowerCase().contains("forum"))

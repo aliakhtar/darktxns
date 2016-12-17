@@ -6,7 +6,8 @@ import org.jsoup.Jsoup
 
 import scala.collection.mutable.ListBuffer
 
-class DownloadLinkExtractor(rawHtml: String) extends Callable[Traversable[DownloadLink]]
+class DownloadLinkExtractor(rawHtml: String)
+    extends Callable[Traversable[DownloadLink]]
 {
     override def call(): Traversable[DownloadLink] =
     {
@@ -18,7 +19,7 @@ class DownloadLinkExtractor(rawHtml: String) extends Callable[Traversable[Downlo
         {
             val href = a.attr("href")
             if (href != null && href.endsWith( DownloadLink.EXTENSION ))
-                result += new DownloadLink( href )
+                result += new DownloadLink( href ) //href will be just the file name atm, e.g file.xz
         })
 
         result

@@ -7,6 +7,7 @@ scalaVersion := "2.12.1"
 /* Dependencies */
 
 val jsoup = "org.jsoup" % "jsoup" % "1.10.1"
+val commonsIo = "commons-io" % "commons-io" % "2.5"
 
 
 lazy val commonSettings = Seq(
@@ -15,7 +16,10 @@ lazy val commonSettings = Seq(
     scalaVersion := "2.12.1",
     assemblyOutputPath in assembly := file("target/darktxns.jar"),
     test in assembly := {},
-    libraryDependencies += jsoup
+
+
+    libraryDependencies += jsoup,
+    libraryDependencies += commonsIo
 )
 
 lazy val be = (project in file(".")).
