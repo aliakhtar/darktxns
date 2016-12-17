@@ -12,11 +12,28 @@ object DownloadLink
 
 class DownloadLink(val fileName: String)
 {
+    /**
+      * Full url to download the file, e.g http://.....xz
+      */
     val fullUrl:String = DownloadLink.DOWNLOAD_DIR + fileName
+
+    /**
+      * Human readable identifier of the market.
+      */
     val marketName:String = parseMarketName(fileName)
     val guessedType:DatasetType = parseType(fileName)
 
 
+    /**
+      * Parses out the human readable market name from the fileName.
+      *
+      * - is used as the word separator. There are names like agora-forums, agora-markets, etc.
+      *
+      * The following method just parses out the first word before -, capitalizes the first letter,
+      * and returns it. E>g for the above, it would return Agora.
+      *
+      * Some market names contain 'market', e.g 'Foomarket'. These are split into two words, i.e 'Foo Market'
+      */
     private def parseMarketName(fileName:String):String =
     {
         if (fileName == "2015-sr2doug-claimedsr2leaks.tar.xz") //This dataset is named inconsistently from others,
