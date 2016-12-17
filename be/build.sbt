@@ -8,6 +8,7 @@ scalaVersion := "2.12.1"
 
 val jsoup = "org.jsoup" % "jsoup" % "1.10.1"
 val commonsIo = "commons-io" % "commons-io" % "2.5"
+val commonsCompressor = "org.apache.commons" % "commons-compress" % "1.12"
 
 
 lazy val commonSettings = Seq(
@@ -19,7 +20,8 @@ lazy val commonSettings = Seq(
 
 
     libraryDependencies += jsoup,
-    libraryDependencies += commonsIo
+    libraryDependencies += commonsIo,
+    libraryDependencies += commonsCompressor
 )
 
 lazy val be = (project in file(".")).
