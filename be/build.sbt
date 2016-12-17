@@ -13,7 +13,7 @@ lazy val commonSettings = Seq(
     test in assembly := {}
 )
 
-lazy val root = (project in file(".")).
+lazy val be = (project in file(".")).
     settings(commonSettings: _*).
     settings(
         mainClass in assembly := Some("com.darktxns.Main")
