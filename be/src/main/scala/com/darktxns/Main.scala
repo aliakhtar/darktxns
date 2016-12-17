@@ -16,7 +16,9 @@ object Main
 
         val dest = new Downloader(toDl).call()
 
-        println("Downloaded..?")
+        Runtime.getRuntime.exec(s"tar -xvf ${dest.getAbsolutePath}").waitFor()
+
+        println("Unzipped? ")
 
     }
 }

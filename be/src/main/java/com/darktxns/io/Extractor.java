@@ -29,7 +29,6 @@ public class Extractor
      * @throws FileNotFoundException
      *
      * @return  The {@link List} of {@link File}s with the untared content.
-     * @throws ArchiveException
      */
     public static List<File> unTar(final File inputFile, final File outputDir) throws Exception
     {
