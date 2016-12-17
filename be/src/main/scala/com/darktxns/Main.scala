@@ -1,14 +1,17 @@
 package com.darktxns
 
+import com.darktxns.archiveOrg.DownloadUrlExtractor
 import com.darktxns.io.Reader
-import org.jsoup.Jsoup
 
 object Main
 {
     def main(args: Array[String]): Unit =
     {
         val rawHtml = Reader readResource "dnmarchives.html"
-        val tree = Jsoup parse rawHtml
-        println "tree: " + tree.head
+        val links = new DownloadUrlExtractor(rawHtml).call()
+
+        println("Links: " + links.size)
+
+        links.foreach(println)
     }
 }
