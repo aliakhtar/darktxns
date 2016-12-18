@@ -29,12 +29,12 @@ class S3UploaderMain(env:Environment, datasets: Traversable[Dataset]) extends Ta
         {
             if (! result.isSuccess)
             {
-                println(s"Failed upload of ${directory.getAbsolutePath}")
+                println(s"FAILED UPLOAD ${directory.getAbsolutePath}")
                 result.failed.get.printStackTrace()
                 failed.incrementAndGet()
             }
             else
-                println(s"Successfully uploaded ${directory.getAbsolutePath}")
+                println(s"SUCCESSFULLY UPLOADED ${directory.getAbsolutePath}")
 
             done.incrementAndGet()
         })

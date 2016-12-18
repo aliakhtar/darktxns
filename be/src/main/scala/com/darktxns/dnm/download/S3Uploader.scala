@@ -18,7 +18,7 @@ class S3Uploader(private val env: Environment)
         {
             override def progressChanged(progressEvent: ProgressEvent):Unit =
             {
-                println(s"Progress: ${dir.getName}, $progressEvent")
+                println(s"${dir.getName}, ${progressEvent.getBytesTransferred} / ${progressEvent.getBytes}")
             }
         }
 
