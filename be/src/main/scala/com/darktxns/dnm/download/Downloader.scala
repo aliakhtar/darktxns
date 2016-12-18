@@ -2,17 +2,15 @@ package com.darktxns.dnm.download
 
 import java.io.File
 import java.net.URL
-import java.util.concurrent.Callable
+import java.util.function.Supplier
 
 import org.apache.commons.io.FileUtils
 
 
-class Downloader(val source:DownloadLink)  extends Callable[File]
+class Downloader(val source:DownloadLink) extends Supplier[File]
 {
-    override def call(): File =
+    override def get(): File =
     {
-        //Download to the filename of the source in the current working directory where this is being run.
-
         val dest = new File( source.fileName )
 
         println(s"Dest: ${dest.getAbsolutePath}")

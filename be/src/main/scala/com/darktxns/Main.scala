@@ -5,6 +5,6 @@ object Main
 {
     def main(args: Array[String]): Unit =
     {
-        DownloaderMain.begin()
+        new DownloaderMain().begin
     }
 }

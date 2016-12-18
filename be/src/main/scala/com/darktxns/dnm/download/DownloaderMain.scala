@@ -2,7 +2,10 @@ package com.darktxns.dnm.download
 
 import com.darktxns.io.Reader
 
-object DownloaderMain
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent._
+
+class DownloaderMain
 {
     def begin():Unit =
     {
@@ -13,10 +16,26 @@ object DownloaderMain
 
         val toDl = links.find(_.fileName == "zanzibarspice.tar.xz").get
 
-        val dest = new Downloader(toDl).call()
+        download(toDl)
+    }
 
-        Runtime.getRuntime.exec(s"tar -xvf ${dest.getAbsolutePath}").waitFor()
+    private def download(link: DownloadLink): Unit =
+    {
+        val downloader = new Downloader(link)
+        implicit val future = Future
+        {
+            blocking
+            {
+                downloader.get()
+            }
+        }
 
-        println("Unzipped? ")
+        future.onComplete(file =>
+        {
+            println("File downloaded: " + file.get.getAbsolutePath)
+            //Runtime.getRuntime.exec(s"tar -xvf ${dest.getAbsolutePath}").waitFor()
+        })
+
+        println("Callback set")
     }
 }
