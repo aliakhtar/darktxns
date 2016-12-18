@@ -13,8 +13,8 @@ class DownloaderMain extends Task
     private val rawHtml = Reader readResource "dnmarchives.html"
     private val links = new DownloadLinkExtractor(rawHtml).call()
 
-    private val toDownload = 1
-    private val toUnzip = 1
+    private val toDownload = links.size
+    private val toUnzip = links.size
 
     private val downloaded = new AtomicInteger(0)
     private val unzipped = new AtomicInteger(0)
@@ -22,11 +22,11 @@ class DownloaderMain extends Task
 
     override def begin():Unit =
     {
-        println("Starting download..")
+        println("Starting downloads..")
 
-        val toDl = links.find(_.fileName == "zanzibarspice.tar.xz").get
+        links.foreach(download)
 
-        download(toDl)
+        println("All download futures added")
     }
 
     override def finished():Boolean = downloaded.get() >= toDownload && unzipped.get() >= toUnzip
@@ -63,4 +63,6 @@ class DownloaderMain extends Task
                 unzipped.incrementAndGet
             } )
     }
+
+    override def status(): String = s"Downloaded: ${downloaded.get()} / $toDownload , Unzipped: ${unzipped.get()} / $toUnzip"
 }

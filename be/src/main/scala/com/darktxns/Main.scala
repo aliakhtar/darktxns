@@ -11,7 +11,8 @@ object Main
 
         while (! task.finished())
         {
-            Thread.sleep(1000)
+            println( task.status() )
+            Thread.sleep(10000)
         }
     }
 }
