@@ -48,7 +48,7 @@ class S3Uploader(private val env: Environment) extends ObjectMetadataProvider
     override def provideObjectMetadata(file: File, metadata: ObjectMetadata): Unit =
     {
         //Make everything viewable thru a browser
-        if (metadata.getContentType.contains("octet"))
+        if ( metadata.getContentType == null || metadata.getContentType.contains("octet"))
             metadata.setContentType("text/html")
     }
 }
