@@ -10,7 +10,7 @@ object Main
         val env = Environment.build()
         val datasets = new DownloadLinkExtractor(Reader.readResource("dnmarchives.html")).call()
 
-        val task:Task = new S3UploaderMain(datasets)
+        val task:Task = new S3UploaderMain(env, datasets)
         task.begin()
 
         while (! task.finished())
