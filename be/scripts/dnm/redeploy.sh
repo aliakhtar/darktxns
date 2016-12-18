@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-cd ../
+cd ../../
 sbt assembly
 
 scp -v -i ~/.ssh/Beast.pem  target/darktxns.jar ubuntu@35.161.174.81:/home/ubuntu
-./scripts/ssh.sh
+./scripts/dnm/ssh.sh
 
