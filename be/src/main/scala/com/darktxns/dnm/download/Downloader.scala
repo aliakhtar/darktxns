@@ -13,10 +13,10 @@ class Downloader(val source:DownloadLink) extends Supplier[File]
     {
         val dest = new File( source.fileName )
 
-        println(s"Dest: ${dest.getAbsolutePath}")
-
+        println(s"Starting download: $source")
         FileUtils.copyURLToFile(new URL(source.fullUrl), dest)
 
+        println(s"Finished downloading $source")
         dest
     }
 }

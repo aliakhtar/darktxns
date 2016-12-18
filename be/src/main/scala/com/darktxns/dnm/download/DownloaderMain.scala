@@ -1,5 +1,7 @@
 package com.darktxns.dnm.download
 
+import java.io.File
+import java.lang.Runtime.getRuntime
 import java.util.concurrent.atomic.AtomicInteger
 
 import com.darktxns.Task
@@ -17,7 +19,7 @@ class DownloaderMain extends Task
     private val toUnzip = 1
 
     private val downloaded = new AtomicInteger(0)
-    private var unzipped = 0
+    private val unzipped = new AtomicInteger(0)
 
 
     override def begin():Unit =
@@ -29,7 +31,7 @@ class DownloaderMain extends Task
         download(toDl)
     }
 
-    override def finished():Boolean = downloaded.get() >= toDownload
+    override def finished():Boolean = downloaded.get() >= toDownload && unzipped.get() >= toUnzip
 
     private def download(link: DownloadLink): Unit =
     {
@@ -45,9 +47,22 @@ class DownloaderMain extends Task
         future.onComplete(file =>
         {
             downloaded.incrementAndGet()
-            //Runtime.getRuntime.exec(s"tar -xvf ${dest.getAbsolutePath}").waitFor()
+            unzip(file.get )
         })
+    }
 
-        println("Callback set")
+    private def unzip(gzippedFile:File) =
+    {
+        println(s"Unzipping ${gzippedFile.getAbsolutePath}")
+        implicit val future = Future
+        {
+            blocking(getRuntime.exec(s"tar -xvf ${gzippedFile.getAbsolutePath}"))
+        }
+
+        future.onComplete(_ =>
+            {
+                println(s"Finished unzipping ${gzippedFile.getAbsolutePath}")
+                unzipped.incrementAndGet
+            } )
     }
 }
