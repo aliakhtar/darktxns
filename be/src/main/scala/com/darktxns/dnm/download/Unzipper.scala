@@ -4,6 +4,10 @@ import java.io.File
 import java.lang.Runtime.getRuntime
 
 
+/**
+  * Do not use, does not work. kept in case its needed for something later
+  */
+@Deprecated
 class Unzipper extends Function1[DownloadResult, File]
 {
     override def apply(download: DownloadResult): File =

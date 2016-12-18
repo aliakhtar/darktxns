@@ -53,6 +53,10 @@ class DownloaderMain extends Task
 
     }
 
+    /**
+      * Umm yeah so the following odes not work, kept here in case its needed for something later. I know i could dig
+      * it up thru the git history but this is a hackathon and i want to waste less time.
+      */
     private def unzip(download:DownloadResult) =
     {
         implicit val future = Future
