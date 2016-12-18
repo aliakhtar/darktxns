@@ -1,4 +1,7 @@
 {
   "awsAccessKey":"AKIAI3N7DK4OSUJXDEPQ",
-  "secretKey":"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"
+  "secretKey":"Ei1Zb3JXfFenieSNWP0dYr0z4MZlHJISSCjttOpV",
+  "dataBucket":"dnm-datasets",
+  "dataBucketUrl": "http://dnm-datasets.s3-website-us-west-2.amazonaws.com/"
+
 }

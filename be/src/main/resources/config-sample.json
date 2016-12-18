@@ -1,4 +1,6 @@
 {
   "awsAccessKey":"aws access key id here",
-  "secretKey":"aws secret key here"
+  "secretKey":"aws secret key here",
+  "dataBucket":"S3 bucket in which datasets are stored goes here",
+  "dataBucketUrl": "http://<dataset bucket>.s3-website-us-west-2.amazonaws.com/"
 }

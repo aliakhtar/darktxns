@@ -30,6 +30,5 @@ class Environment(val config: Config)
 {
     val awsCreds = new BasicAWSCredentials(config.awsAccessKey, config.secretKey)
 
-
     override def toString = s"Environment($awsCreds, $config)"
 }
