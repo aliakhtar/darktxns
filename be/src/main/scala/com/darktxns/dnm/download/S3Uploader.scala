@@ -30,8 +30,8 @@ class S3Uploader(private val env: Environment) extends ObjectMetadataProvider
                 if (e.getEventType != TRANSFER_COMPLETED_EVENT)
                     return
 
-                println(s"Finished upload of ${dir.getAbsolutePath}")
-                bytesUploaded.set( e.getBytesTransferred )
+                val bytes = if (e.getBytesTransferred > 0) e.getBytesTransferred else e.getBytes
+                bytesUploaded.set( bytes )
                 uploaded.set(true)
             }
         })
@@ -48,7 +48,7 @@ class S3Uploader(private val env: Environment) extends ObjectMetadataProvider
     override def provideObjectMetadata(file: File, metadata: ObjectMetadata): Unit =
     {
         //Make everything viewable thru a browser
-        if ( metadata.getContentType == null || metadata.getContentType.contains("octet"))
+        if ( metadata.getContentType != null && metadata.getContentType.contains("octet"))
             metadata.setContentType("text/html")
     }
 }
