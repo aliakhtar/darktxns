@@ -8,6 +8,7 @@ scalaVersion := "2.12.1"
 
 val jsoup = "org.jsoup" % "jsoup" % "1.10.1"
 val commonsIo = "commons-io" % "commons-io" % "2.5"
+val s3 = "com.amazonaws" % "aws-java-sdk-s3" % "1.11.68"
 
 
 lazy val commonSettings = Seq(
@@ -19,7 +20,8 @@ lazy val commonSettings = Seq(
 
 
     libraryDependencies += jsoup,
-    libraryDependencies += commonsIo
+    libraryDependencies += commonsIo,
+    libraryDependencies += s3
 )
 
 lazy val be = (project in file(".")).
