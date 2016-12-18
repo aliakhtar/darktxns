@@ -11,12 +11,14 @@ class Downloader(val source:DownloadLink) extends Supplier[DownloadResult]
 {
     override def get(): DownloadResult =
     {
-        val dest = new File( source.fileName )
+        new File("downloads").mkdirs()
 
-        println(s"Starting download: $source")
+        val dest = new File(  s"downloads/${source.fileName}" )
+
+        println(s"Starting download: ${source.fullUrl}")
         FileUtils.copyURLToFile(new URL(source.fullUrl), dest)
 
-        println(s"Finished downloading $source")
+        println(s"Finished downloading ${source.fullUrl}")
         DownloadResult(source, dest)
     }
 }

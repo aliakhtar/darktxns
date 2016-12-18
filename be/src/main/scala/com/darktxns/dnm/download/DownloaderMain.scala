@@ -14,7 +14,7 @@ class DownloaderMain extends Task
     private val links = new DownloadLinkExtractor(rawHtml).call()
 
     private val toDownload = links.size
-    private val toUnzip = links.size
+    private val toUnzip = 0
 
     private val downloaded = new AtomicInteger(0)
     private val unzipped = new AtomicInteger(0)
@@ -44,9 +44,13 @@ class DownloaderMain extends Task
 
         future.onComplete(result =>
         {
-            downloaded.incrementAndGet()
-            unzip(result.get )
+            if (result.isSuccess)
+                downloaded.incrementAndGet()
+            else
+                println(s"FAILED DOWNLOADING ${link.fullUrl}. ${future.toString}")
+            //unzip(result.get )
         })
+
     }
 
     private def unzip(download:DownloadResult) =
