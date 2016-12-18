@@ -1,22 +1,24 @@
-package com.darktxns.dnm.download
+package com.darktxns.dnm.dataset
 
-import com.darktxns.dnm.DatasetType
-import com.darktxns.dnm.DatasetType.DatasetType
+import java.io.File
 
-object DownloadLink
+import com.darktxns.dnm.dataset.DatasetType.DatasetType
+
+object Dataset
 {
     /* The parsed links are just the file names, they are appended to the below dir to get the full download URL */
 
-    val DOWNLOAD_DIR = "https://archive.org/download/dnmarchives/"
+    private val ARCHIVEORG_DOWNLOAD_DIR = "https://archive.org/download/dnmarchives/"
+    private val UNZIP_DIR = "raw/"
     val EXTENSION = ".tar.xz"
 }
 
-class DownloadLink(val fileName: String)
+class Dataset(val fileName: String)
 {
     /**
       * Full url to download the file, e.g http://.....xz
       */
-    val fullUrl:String = DownloadLink.DOWNLOAD_DIR + fileName
+    val fullUrl:String = Dataset.ARCHIVEORG_DOWNLOAD_DIR + fileName
 
     /**
       * Human readable identifier of the market.
@@ -24,6 +26,8 @@ class DownloadLink(val fileName: String)
     val marketName:String = parseMarketName(fileName)
     val guessedType:DatasetType = parseType(fileName)
 
+    val directories:Traversable[File] =
+            new File( Dataset.UNZIP_DIR + fileName.replace(Dataset.EXTENSION, "") ).listFiles()
 
     /**
       * Parses out the human readable market name from the fileName.
@@ -42,7 +46,7 @@ class DownloadLink(val fileName: String)
 
         val processed = fileName
             .trim
-            .substring(0, fileName.length - DownloadLink.EXTENSION.length) //Parse out the extension
+            .substring(0, fileName.length - Dataset.EXTENSION.length) //Parse out the extension
             .toLowerCase
             .replace("market", " Market")
             .capitalize

@@ -3,6 +3,7 @@ package com.darktxns.dnm.download
 import java.util.concurrent.atomic.AtomicInteger
 
 import com.darktxns.Task
+import com.darktxns.dnm.dataset.Dataset
 import com.darktxns.io.Reader
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -31,7 +32,7 @@ class DownloaderMain extends Task
 
     override def finished():Boolean = downloaded.get() >= toDownload && unzipped.get() >= toUnzip
 
-    private def download(link: DownloadLink): Unit =
+    private def download(link: Dataset): Unit =
     {
         val downloader = new Downloader(link)
         implicit val future = Future

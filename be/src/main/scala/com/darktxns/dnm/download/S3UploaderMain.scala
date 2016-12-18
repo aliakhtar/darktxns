@@ -4,8 +4,9 @@ import java.io.File
 import java.util.concurrent.atomic.AtomicInteger
 
 import com.darktxns.Task
+import com.darktxns.dnm.dataset.Dataset
 
-class S3UploaderMain(datasets: Traversable[DownloadLink]) extends Task
+class S3UploaderMain(datasets: Traversable[Dataset]) extends Task
 {
     val total = new AtomicInteger()
     val uploading = new AtomicInteger(0)
@@ -14,14 +15,9 @@ class S3UploaderMain(datasets: Traversable[DownloadLink]) extends Task
 
     override def begin(): Unit =
     {
-        datasets.flatMap(toDirectory).foreach(upload)
+        datasets.flatMap(_.directories).foreach(upload)
     }
 
-
-    private def toDirectory(link: DownloadLink):Array[File] =
-    {
-        new File("raw/" + link.fileName.replace(DownloadLink.EXTENSION, "")).listFiles()
-    }
 
     private def upload(directory: File):Unit =
     {

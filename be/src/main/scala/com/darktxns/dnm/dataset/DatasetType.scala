@@ -1,4 +1,4 @@
-package com.darktxns.dnm
+package com.darktxns.dnm.dataset
 
 object DatasetType extends Enumeration
 {

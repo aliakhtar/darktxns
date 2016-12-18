@@ -4,10 +4,11 @@ import java.io.File
 import java.net.URL
 import java.util.function.Supplier
 
+import com.darktxns.dnm.dataset.Dataset
 import org.apache.commons.io.FileUtils
 
 
-class Downloader(val source:DownloadLink) extends Supplier[DownloadResult]
+class Downloader(val source:Dataset) extends Supplier[DownloadResult]
 {
     override def get(): DownloadResult =
     {
