@@ -2,32 +2,30 @@ package com.darktxns.dnm.download
 
 import java.io.File
 
-import com.amazonaws.event.ProgressEvent
-import com.amazonaws.services.s3.model.PutObjectRequest
-import com.amazonaws.services.s3.transfer.internal.S3ProgressListener
-import com.amazonaws.services.s3.transfer.{PersistableTransfer, TransferManager, Upload}
+import com.amazonaws.annotation.ThreadSafe
+import com.amazonaws.event.{ProgressEvent, ProgressListener}
+import com.amazonaws.services.s3.transfer._
 import com.darktxns.Environment
 
+@ThreadSafe
 class S3Uploader(private val env: Environment)
 {
     private val transferer = new TransferManager( env.awsCreds )
 
-    def upload(file:File):Upload =
+    def uploadDirectory(dir:File):MultipleFileUpload =
     {
-        val listener = new S3ProgressListener
+        val listener = new ProgressListener
         {
-            override def onPersistableTransfer(persistableTransfer: PersistableTransfer):Unit =
-            {
-                println(s"PersistableTransfer: ${file.getName}, $persistableTransfer")
-            }
-
             override def progressChanged(progressEvent: ProgressEvent):Unit =
             {
-                println(s"Progress: ${file.getName}, $progressEvent")
+                println(s"Progress: ${dir.getName}, $progressEvent")
             }
         }
 
-        val request = new PutObjectRequest(env.config.dataBucket, file.getName, file)
-        transferer.upload(request, listener)
+        val result = transferer.uploadDirectory(env.config.dataBucket, dir.getName, dir, true)
+        result.addProgressListener(listener)
+
+        println(s"Upload started for ${dir.getAbsolutePath}")
+        result
     }
 }

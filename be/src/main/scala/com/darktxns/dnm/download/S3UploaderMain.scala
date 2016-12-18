@@ -3,15 +3,18 @@ package com.darktxns.dnm.download
 import java.io.File
 import java.util.concurrent.atomic.AtomicInteger
 
-import com.darktxns.Task
 import com.darktxns.dnm.dataset.Dataset
+import com.darktxns.{Environment, Task}
 
-class S3UploaderMain(datasets: Traversable[Dataset]) extends Task
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent._
+
+class S3UploaderMain(env:Environment, datasets: Traversable[Dataset]) extends Task
 {
     val total = new AtomicInteger()
-    val uploading = new AtomicInteger(0)
     val done = new AtomicInteger(0)
-
+    val failed = new AtomicInteger(0)
+    val s3Uploader = new S3Uploader(env)
 
     override def begin(): Unit =
     {
@@ -21,7 +24,21 @@ class S3UploaderMain(datasets: Traversable[Dataset]) extends Task
 
     private def upload(directory: File):Unit =
     {
-        println(s"Uploading ${directory.getAbsolutePath}")
+        val future = Future{ blocking( s3Uploader.uploadDirectory(directory) ) }
+        future.onComplete(result =>
+        {
+            if (! result.isSuccess)
+            {
+                println(s"Failed upload of ${directory.getAbsolutePath}")
+                result.failed.get.printStackTrace()
+                failed.incrementAndGet()
+            }
+            else
+                println(s"Successfully uploaded ${directory.getAbsolutePath}")
+
+            done.incrementAndGet()
+        })
+
         total.incrementAndGet()
     }
 
@@ -32,6 +49,6 @@ class S3UploaderMain(datasets: Traversable[Dataset]) extends Task
 
     override def status(): String =
     {
-        s"${done.get()} / ${total.get()} uploaded, ${done.get()} uploading."
+        s"${done.get()} / ${total.get()} uploaded, ${failed.get()} failed."
     }
 }
