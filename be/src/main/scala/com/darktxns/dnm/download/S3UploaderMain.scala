@@ -37,7 +37,7 @@ class S3UploaderMain(env:Environment, datasets: Traversable[Dataset]) extends Ta
             }
             else
             {
-                println(s"SUCCESSFULLY UPLOADED ${directory.getAbsolutePath}")
+                println(s"SUCCESSFULLY UPLOADED ${directory.getAbsolutePath}, ${result.get}")
                 bytesUploaded.getAndAdd( result.get )
             }
 

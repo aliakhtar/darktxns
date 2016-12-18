@@ -1,6 +1,7 @@
 package com.darktxns.dnm.download
 
 import java.io.File
+import java.nio.file.{Files, Paths}
 import java.util.concurrent.atomic.{AtomicBoolean, AtomicLong}
 
 import com.amazonaws.annotation.ThreadSafe
@@ -30,6 +31,7 @@ class S3Uploader(private val env: Environment) extends ObjectMetadataProvider
                 if (e.getEventType != TRANSFER_COMPLETED_EVENT)
                     return
 
+                println( e.toString )
                 val bytes = if (e.getBytesTransferred > 0) e.getBytesTransferred else e.getBytes
                 bytesUploaded.set( bytes )
                 uploaded.set(true)
@@ -47,8 +49,6 @@ class S3Uploader(private val env: Environment) extends ObjectMetadataProvider
 
     override def provideObjectMetadata(file: File, metadata: ObjectMetadata): Unit =
     {
-        //Make everything viewable thru a browser
-        if ( metadata.getContentType != null && metadata.getContentType.contains("octet"))
-            metadata.setContentType("text/html")
+         metadata.setContentType( Files.probeContentType( Paths.get(file.getAbsolutePath) ) )
     }
 }
