@@ -24,7 +24,7 @@ class S3UploaderMain(env:Environment, datasets: Traversable[Dataset]) extends Ta
 
     private def upload(directory: File):Unit =
     {
-        val future = Future{ blocking( s3Uploader.uploadDirectory(directory) ) }
+        implicit val future = Future{ blocking( s3Uploader.uploadDirectory(directory) ) }
         future.onComplete(result =>
         {
             if (! result.isSuccess)
