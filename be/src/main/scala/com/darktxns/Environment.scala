@@ -1,6 +1,6 @@
 package com.darktxns
 
-import com.amazonaws.auth.{AWSCredentials, BasicAWSCredentials}
+import com.amazonaws.auth.BasicAWSCredentials
 import com.darktxns.io.Reader
 import org.json4s.DefaultFormats
 import org.json4s.native.JsonMethods
@@ -14,14 +14,14 @@ object Environment
         implicit val formats = DefaultFormats
 
         val config = JsonMethods.parse(json).extract[Config]
-
-        println(config.toString)
-
-        val creds = new BasicAWSCredentials(config.awsAccessKey, config.secretKey)
-        new Environment(creds)
+        new Environment(config)
     }
 }
 
-class Environment(val awsCreds:AWSCredentials)
+class Environment(val config: Config)
 {
+    val awsCreds = new BasicAWSCredentials(config.awsAccessKey, config.secretKey)
+
+
+    override def toString = s"Environment($awsCreds, $config)"
 }
