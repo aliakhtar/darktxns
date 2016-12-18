@@ -6,6 +6,7 @@ scalaVersion := "2.12.1"
 
 /* Dependencies */
 
+val json4sNative = "org.json4s" %% "json4s-native" % "3.5.0"
 val jsoup = "org.jsoup" % "jsoup" % "1.10.1"
 val commonsIo = "commons-io" % "commons-io" % "2.5"
 val s3 = "com.amazonaws" % "aws-java-sdk-s3" % "1.11.68"
@@ -19,6 +20,7 @@ lazy val commonSettings = Seq(
     test in assembly := {},
 
 
+    libraryDependencies += json4sNative,
     libraryDependencies += jsoup,
     libraryDependencies += commonsIo,
     libraryDependencies += s3
