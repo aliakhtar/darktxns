@@ -6,11 +6,12 @@ import java.util.concurrent.atomic.{AtomicBoolean, AtomicLong}
 import com.amazonaws.annotation.ThreadSafe
 import com.amazonaws.event.ProgressEventType.TRANSFER_COMPLETED_EVENT
 import com.amazonaws.event.{ProgressEvent, ProgressListener}
+import com.amazonaws.services.s3.model.ObjectMetadata
 import com.amazonaws.services.s3.transfer._
 import com.darktxns.Environment
 
 @ThreadSafe
-class S3Uploader(private val env: Environment)
+class S3Uploader(private val env: Environment) extends ObjectMetadataProvider
 {
     private val transferer = new TransferManager( env.awsCreds )
 
@@ -18,7 +19,7 @@ class S3Uploader(private val env: Environment)
     {
         val uploaded = new AtomicBoolean(false)
         val bytesUploaded = new AtomicLong(0L)
-        val upload = transferer.uploadDirectory(env.config.dataBucket, dir.getName, dir, true)
+        val upload = transferer.uploadDirectory(env.config.dataBucket, dir.getName, dir, true, this)
         println(s"Upload started for ${dir.getAbsolutePath}")
 
         // Block until the upload finishes
@@ -41,5 +42,13 @@ class S3Uploader(private val env: Environment)
         }
 
         bytesUploaded.get()
+    }
+
+
+    override def provideObjectMetadata(file: File, metadata: ObjectMetadata): Unit =
+    {
+        //Make everything viewable thru a browser
+        if (metadata.getContentType.contains("octet"))
+            metadata.setContentType("text/html")
     }
 }
