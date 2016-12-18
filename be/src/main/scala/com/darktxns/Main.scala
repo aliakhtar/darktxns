@@ -6,10 +6,10 @@ object Main
 {
     def main(args: Array[String]): Unit =
     {
-        val downloader = new DownloaderMain
-        downloader.begin()
+        val task:Task = new DownloaderMain
+        task.begin()
 
-        while (! downloader.finished())
+        while (! task.finished())
         {
             Thread.sleep(1000)
         }

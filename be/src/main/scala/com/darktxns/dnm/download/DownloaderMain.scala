@@ -2,24 +2,25 @@ package com.darktxns.dnm.download
 
 import java.util.concurrent.atomic.AtomicInteger
 
+import com.darktxns.Task
 import com.darktxns.io.Reader
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent._
 
-class DownloaderMain
+class DownloaderMain extends Task
 {
-    val rawHtml = Reader readResource "dnmarchives.html"
-    val links = new DownloadLinkExtractor(rawHtml).call()
+    private val rawHtml = Reader readResource "dnmarchives.html"
+    private val links = new DownloadLinkExtractor(rawHtml).call()
 
-    val toDownload = 1
-    val toUnzip = 1
+    private val toDownload = 1
+    private val toUnzip = 1
 
-    val downloaded = new AtomicInteger(0)
-    var unzipped = 0
+    private val downloaded = new AtomicInteger(0)
+    private var unzipped = 0
 
 
-    def begin():Unit =
+    override def begin():Unit =
     {
         println("Starting download..")
 
@@ -28,7 +29,7 @@ class DownloaderMain
         download(toDl)
     }
 
-    def finished():Boolean = downloaded.get() >= toDownload
+    override def finished():Boolean = downloaded.get() >= toDownload
 
     private def download(link: DownloadLink): Unit =
     {
