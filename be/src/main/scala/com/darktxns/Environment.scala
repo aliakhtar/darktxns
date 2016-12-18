@@ -15,6 +15,8 @@ object Environment
 
         val config = JsonMethods.parse(json).extract[Config]
 
+        println(config.toString)
+
         val creds = new BasicAWSCredentials(config.awsAccessKey, config.secretKey)
         new Environment(creds)
     }
@@ -22,5 +24,4 @@ object Environment
 
 class Environment(val awsCreds:AWSCredentials)
 {
-
 }
