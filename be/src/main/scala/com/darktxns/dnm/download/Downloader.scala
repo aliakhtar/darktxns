@@ -7,9 +7,9 @@ import java.util.function.Supplier
 import org.apache.commons.io.FileUtils
 
 
-class Downloader(val source:DownloadLink) extends Supplier[File]
+class Downloader(val source:DownloadLink) extends Supplier[DownloadResult]
 {
-    override def get(): File =
+    override def get(): DownloadResult =
     {
         val dest = new File( source.fileName )
 
@@ -17,6 +17,6 @@ class Downloader(val source:DownloadLink) extends Supplier[File]
         FileUtils.copyURLToFile(new URL(source.fullUrl), dest)
 
         println(s"Finished downloading $source")
-        dest
+        DownloadResult(source, dest)
     }
 }

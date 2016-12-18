@@ -1,6 +1,5 @@
 package com.darktxns.dnm.download
 
-import java.io.File
 import java.util.concurrent.atomic.AtomicInteger
 
 import com.darktxns.Task
@@ -43,24 +42,24 @@ class DownloaderMain extends Task
             }
         }
 
-        future.onComplete(file =>
+        future.onComplete(result =>
         {
             downloaded.incrementAndGet()
-            unzip(file.get )
+            unzip(result.get )
         })
     }
 
-    private def unzip(gzippedFile:File) =
+    private def unzip(download:DownloadResult) =
     {
         implicit val future = Future
         {
-            blocking( new Unzipper().apply(gzippedFile) )
+            blocking( new Unzipper().apply(download) )
         }
 
         future.onComplete(_ =>
             {
-                println(s"Finished unzipping ${gzippedFile.getAbsolutePath}")
-                gzippedFile.delete()
+                println(s"Finished unzipping ${download.file.getAbsolutePath}")
+                download.file.delete()
                 unzipped.incrementAndGet
             } )
     }
