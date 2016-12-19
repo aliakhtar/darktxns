@@ -7,15 +7,21 @@ import java.util.concurrent.atomic.AtomicLong
 import com.amazonaws.annotation.ThreadSafe
 import com.amazonaws.event.ProgressEventType.{CLIENT_REQUEST_FAILED_EVENT, TRANSFER_FAILED_EVENT, TRANSFER_PART_FAILED_EVENT}
 import com.amazonaws.event.{ProgressEvent, ProgressEventType, ProgressListener}
+import com.amazonaws.regions.{Region, Regions}
 import com.amazonaws.services.s3.model.ObjectMetadata
 import com.amazonaws.services.s3.transfer._
+import com.amazonaws.services.s3.{AmazonS3Client, S3ClientOptions}
 import com.darktxns.Environment
 import org.apache.commons.io.FileUtils
 
 @ThreadSafe
 class S3Uploader(private val env: Environment) extends ObjectMetadataProvider
 {
-    private val transferer = new TransferManager( env.awsCreds )
+    private val s3 = new AmazonS3Client(env.awsCreds)
+    s3.setRegion(Region.getRegion(Regions.US_WEST_2))
+    s3.setS3ClientOptions(S3ClientOptions.builder().enableDualstack().setAccelerateModeEnabled(true).build())
+
+    private val transferer = new TransferManager( s3 )
 
     def uploadDirectory(dir:File):Long =
     {
