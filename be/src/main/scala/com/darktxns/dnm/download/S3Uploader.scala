@@ -31,7 +31,10 @@ class S3Uploader(private val env: Environment) extends ObjectMetadataProvider
                 override def progressChanged(e: ProgressEvent):Unit =
                 {
                     if (e.getEventType != ProgressEventType.TRANSFER_COMPLETED_EVENT)
+                    {
+                        println( s"${u.getDescription}, ${e.getEventType}" )
                         return
+                    }
 
                     bytesUploaded.getAndAdd( u.getProgress.getBytesTransferred )
                     val sentUnderThisTransfer = FileUtils.byteCountToDisplaySize( bytesUploaded.get() )
