@@ -7,9 +7,6 @@ import com.darktxns.dnm.dataset.Dataset
 import com.darktxns.{Environment, Task}
 import org.apache.commons.io.FileUtils.byteCountToDisplaySize
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent._
-
 class S3UploaderMain(env:Environment, datasets: Traversable[Dataset]) extends Task
 {
     val total = new AtomicInteger()
@@ -20,31 +17,28 @@ class S3UploaderMain(env:Environment, datasets: Traversable[Dataset]) extends Ta
 
     override def begin(): Unit =
     {
+        total.set( datasets.size )
         datasets.flatMap(_.directories).foreach(upload)
     }
 
 
     private def upload(directory: File):Unit =
     {
-        implicit val future = Future{ blocking( s3Uploader.uploadDirectory(directory) ) }
-        future.onComplete(result =>
+        try
         {
-            if (! result.isSuccess)
+            val result = s3Uploader.uploadDirectory(directory)
+            println(s"SUCCESSFULLY UPLOADED ${directory.getAbsolutePath}, $result")
+            bytesUploaded.getAndAdd( result )
+        }
+        catch
+        {
+            case e:Exception =>
             {
-                println(s"FAILED UPLOAD ${directory.getAbsolutePath}")
-                result.failed.get.printStackTrace()
                 failed.incrementAndGet()
+                println(s"FAILED UPLOAD ${directory.getAbsolutePath}")
+                e.printStackTrace()
             }
-            else
-            {
-                println(s"SUCCESSFULLY UPLOADED ${directory.getAbsolutePath}, ${result.get}")
-                bytesUploaded.getAndAdd( result.get )
-            }
-
-            done.incrementAndGet()
-        })
-
-        total.incrementAndGet()
+        }
     }
 
     override def finished(): Boolean =
