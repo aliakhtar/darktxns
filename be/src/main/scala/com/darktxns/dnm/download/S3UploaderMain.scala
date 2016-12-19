@@ -36,7 +36,7 @@ class S3UploaderMain(env:Environment, datasets: Traversable[Dataset]) extends Ta
             bytesUploaded.getAndAdd( dirBytes )
 
             dirSizeMap += (directory.getName -> byteCountToDisplaySize(dirBytes))
-            dirSizeMap.foreach(_.toString())
+            dirSizeMap.foreach(t => println(t.toString()))
         }
         catch
         {
