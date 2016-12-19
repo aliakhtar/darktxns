@@ -2,7 +2,7 @@ package com.darktxns.dnm.download
 
 import java.io.File
 import java.nio.file.{Files, Paths}
-import java.util.concurrent.atomic.{AtomicBoolean, AtomicLong}
+import java.util.concurrent.atomic.AtomicLong
 
 import com.amazonaws.annotation.ThreadSafe
 import com.amazonaws.event.ProgressEventType.TRANSFER_COMPLETED_EVENT
@@ -18,31 +18,30 @@ class S3Uploader(private val env: Environment) extends ObjectMetadataProvider
 
     def uploadDirectory(dir:File):Long =
     {
-        val uploaded = new AtomicBoolean(false)
-        val bytesUploaded = new AtomicLong(0L)
         val upload = transferer.uploadDirectory(env.config.dataBucket, dir.getName, dir, true, this)
+
+        val bytesUploaded = new AtomicLong(0L)
         println(s"Upload started for ${dir.getAbsolutePath}")
 
         // Block until the upload finishes
-        upload.addProgressListener(new ProgressListener
+        upload.getSubTransfers.forEach(u =>
         {
-            override def progressChanged(e: ProgressEvent):Unit =
+            u.addProgressListener(new ProgressListener
             {
-                if (e.getEventType != TRANSFER_COMPLETED_EVENT)
-                    return
+                override def progressChanged(e: ProgressEvent):Unit =
+                {
+                    if (e.getEventType != TRANSFER_COMPLETED_EVENT)
+                        return
 
-                println( e.toString )
-                val bytes = if (e.getBytesTransferred > 0) e.getBytesTransferred else e.getBytes
-                bytesUploaded.set( bytes )
-                uploaded.set(true)
-            }
+                    println(s"${u.getDescription}")
+                    println( s"transfered: ${e.getBytesTransferred}, bytes: ${e.getBytes}" )
+
+                    val bytes = if (e.getBytesTransferred > 0) e.getBytesTransferred else e.getBytes
+                    bytesUploaded.getAndAdd( bytes )
+                }
+            })
         })
-
-        while (! uploaded.get())
-        {
-            Thread.sleep(1000)
-        }
-
+        upload.waitForCompletion()
         bytesUploaded.get()
     }
 
