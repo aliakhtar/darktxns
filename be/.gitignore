@@ -70,4 +70,4 @@ crashlytics-build.properties
 fabric.properties
 
 downloads/*
-
+src/main/resources/config.json
