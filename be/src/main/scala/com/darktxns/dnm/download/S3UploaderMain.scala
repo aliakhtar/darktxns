@@ -28,6 +28,7 @@ class S3UploaderMain(env:Environment, datasets: Traversable[Dataset]) extends Ta
         {
             val result = s3Uploader.uploadDirectory(directory)
             println(s"SUCCESSFULLY UPLOADED ${directory.getAbsolutePath}, $result")
+            println(status())
             bytesUploaded.getAndAdd( result )
         }
         catch
