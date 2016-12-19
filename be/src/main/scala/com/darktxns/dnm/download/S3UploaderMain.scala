@@ -27,7 +27,7 @@ class S3UploaderMain(env:Environment, datasets: Traversable[Dataset]) extends Ta
         try
         {
             val result = s3Uploader.uploadDirectory(directory)
-            println(s"SUCCESSFULLY UPLOADED ${directory.getAbsolutePath}, $result")
+            println(s"SUCCESSFULLY UPLOADED ${directory.getAbsolutePath}, ${byteCountToDisplaySize(result)}")
             println(status())
             bytesUploaded.getAndAdd( result )
         }
