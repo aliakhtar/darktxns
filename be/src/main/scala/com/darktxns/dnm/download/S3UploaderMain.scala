@@ -17,7 +17,7 @@ class S3UploaderMain(env:Environment, datasets: Traversable[Dataset]) extends Ta
     val s3Uploader = new S3Uploader(env)
     val bytesUploaded = new AtomicLong(0)
 
-    private val uploadSizes = mutable.LinkedHashMap.empty[String, String]
+    private val dirSizeMap = mutable.LinkedHashMap.empty[String, String]
 
     override def begin(): Unit =
     {
@@ -35,8 +35,8 @@ class S3UploaderMain(env:Environment, datasets: Traversable[Dataset]) extends Ta
             println(status())
             bytesUploaded.getAndAdd( dirBytes )
 
-            uploadSizes += (directory.getName -> byteCountToDisplaySize(dirBytes))
-            println(uploadSizes.toString() )
+            dirSizeMap += (directory.getName -> byteCountToDisplaySize(dirBytes))
+            dirSizeMap.foreach(_.toString())
         }
         catch
         {
