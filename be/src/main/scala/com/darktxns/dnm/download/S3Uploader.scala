@@ -33,10 +33,10 @@ class S3Uploader(private val env: Environment) extends ObjectMetadataProvider
                     if (e.getEventType != ProgressEventType.TRANSFER_COMPLETED_EVENT)
                         return
 
-                    val xfered = FileUtils.byteCountToDisplaySize( u.getProgress.getBytesTransferred )
-                    val toXfer = FileUtils.byteCountToDisplaySize( u.getProgress.getTotalBytesToTransfer )
-                    println(s"${u.getDescription}")
                     bytesUploaded.getAndAdd( u.getProgress.getBytesTransferred )
+                    val sentUnderThisTransfer = FileUtils.byteCountToDisplaySize( bytesUploaded.get() )
+
+                    println(s"${dir.getName}, $sentUnderThisTransfer")
                 }
             })
         })
