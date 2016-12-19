@@ -30,14 +30,11 @@ class S3Uploader(private val env: Environment) extends ObjectMetadataProvider
             {
                 override def progressChanged(e: ProgressEvent):Unit =
                 {
-                    if (e.getEventType != TRANSFER_COMPLETED_EVENT)
-                        return
+                    if (e.getEventType == TRANSFER_COMPLETED_EVENT)
+                        println(s"Completed: ${u.getDescription}")
 
-                    println(s"${u.getDescription}")
-                    println( s"transfered: ${e.getBytesTransferred}, bytes: ${e.getBytes}" )
-
-                    val bytes = if (e.getBytesTransferred > 0) e.getBytesTransferred else e.getBytes
-                    bytesUploaded.getAndAdd( bytes )
+                    if (e.getBytesTransferred > 0)
+                        bytesUploaded.getAndAdd( e.getBytesTransferred )
                 }
             })
         })
