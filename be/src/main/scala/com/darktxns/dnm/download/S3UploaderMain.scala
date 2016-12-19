@@ -7,6 +7,8 @@ import com.darktxns.dnm.dataset.Dataset
 import com.darktxns.{Environment, Task}
 import org.apache.commons.io.FileUtils.byteCountToDisplaySize
 
+import scala.collection.mutable
+
 class S3UploaderMain(env:Environment, datasets: Traversable[Dataset]) extends Task
 {
     val total = new AtomicInteger()
@@ -14,6 +16,8 @@ class S3UploaderMain(env:Environment, datasets: Traversable[Dataset]) extends Ta
     val failed = new AtomicInteger(0)
     val s3Uploader = new S3Uploader(env)
     val bytesUploaded = new AtomicLong(0)
+
+    private val uploadSizes = mutable.LinkedHashMap.empty[String, String]
 
     override def begin(): Unit =
     {
@@ -26,10 +30,13 @@ class S3UploaderMain(env:Environment, datasets: Traversable[Dataset]) extends Ta
     {
         try
         {
-            val result = s3Uploader.uploadDirectory(directory)
-            println(s"SUCCESSFULLY UPLOADED ${directory.getAbsolutePath}, ${byteCountToDisplaySize(result)}")
+            val dirBytes = s3Uploader.uploadDirectory(directory)
+            println(s"SUCCESSFULLY UPLOADED ${directory.getAbsolutePath}, ${byteCountToDisplaySize(dirBytes)}")
             println(status())
-            bytesUploaded.getAndAdd( result )
+            bytesUploaded.getAndAdd( dirBytes )
+
+            uploadSizes += (directory.getName -> byteCountToDisplaySize(dirBytes))
+            println(uploadSizes.toString() )
         }
         catch
         {
