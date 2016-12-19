@@ -7,9 +7,11 @@ scalaVersion := "2.12.1"
 /* Dependencies */
 
 val json4sNative = "org.json4s" %% "json4s-native" % "3.5.0"
+val guava = "com.google.guava" % "guava" % "20.0"
 val jsoup = "org.jsoup" % "jsoup" % "1.10.1"
 val commonsIo = "commons-io" % "commons-io" % "2.5"
 val s3 = "com.amazonaws" % "aws-java-sdk-s3" % "1.11.68"
+val bitcoinj = "com.google" % "bitcoinj" % "0.11.3"
 
 
 lazy val commonSettings = Seq(
@@ -21,9 +23,11 @@ lazy val commonSettings = Seq(
 
 
     libraryDependencies += json4sNative,
+    libraryDependencies += guava,
     libraryDependencies += jsoup,
     libraryDependencies += commonsIo,
-    libraryDependencies += s3
+    libraryDependencies += s3,
+    libraryDependencies += bitcoinj
 )
 
 lazy val be = (project in file(".")).
