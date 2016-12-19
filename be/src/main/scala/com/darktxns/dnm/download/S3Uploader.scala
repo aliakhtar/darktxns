@@ -5,10 +5,11 @@ import java.nio.file.{Files, Paths}
 import java.util.concurrent.atomic.AtomicLong
 
 import com.amazonaws.annotation.ThreadSafe
-import com.amazonaws.event.{ProgressEvent, ProgressListener}
+import com.amazonaws.event.{ProgressEvent, ProgressEventType, ProgressListener}
 import com.amazonaws.services.s3.model.ObjectMetadata
 import com.amazonaws.services.s3.transfer._
 import com.darktxns.Environment
+import org.apache.commons.io.FileUtils
 
 @ThreadSafe
 class S3Uploader(private val env: Environment) extends ObjectMetadataProvider
@@ -29,15 +30,18 @@ class S3Uploader(private val env: Environment) extends ObjectMetadataProvider
             {
                 override def progressChanged(e: ProgressEvent):Unit =
                 {
-                    //if (e.getEventType == TRANSFER_COMPLETED_EVENT)
-                      //  println(s"Completed: ${u.getDescription}")
+                    if (e.getEventType != ProgressEventType.TRANSFER_COMPLETED_EVENT)
+                        return
 
-                    if (e.getBytesTransferred > 0)
-                        bytesUploaded.getAndAdd( e.getBytesTransferred )
+                    val xfered = FileUtils.byteCountToDisplaySize( u.getProgress.getBytesTransferred )
+                    val toXfer = FileUtils.byteCountToDisplaySize( u.getProgress.getTotalBytesToTransfer )
+                    println(s"${u.getDescription}")
+                    bytesUploaded.getAndAdd( u.getProgress.getBytesTransferred )
                 }
             })
         })
         upload.waitForCompletion()
+        println(s"Upload finished for ${dir.getAbsolutePath}")
         bytesUploaded.get()
     }
 
