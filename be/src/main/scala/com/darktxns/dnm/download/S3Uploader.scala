@@ -10,6 +10,7 @@ import com.amazonaws.services.s3.model.ObjectMetadata
 import com.amazonaws.services.s3.transfer._
 import com.amazonaws.services.s3.{AmazonS3Client, S3ClientOptions}
 import com.darktxns.Environment
+import org.apache.commons.io.FileUtils
 
 @ThreadSafe
 class S3Uploader(private val env: Environment) extends ObjectMetadataProvider
@@ -25,7 +26,18 @@ class S3Uploader(private val env: Environment) extends ObjectMetadataProvider
         val upload = transferer.uploadDirectory(env.config.dataBucket, dir.getName, dir, true, this)
 
         val bytesUploaded = new AtomicLong( upload.getProgress.getTotalBytesToTransfer )
-        println(s"Upload started for ${dir.getAbsolutePath}")
+        val toXfer = FileUtils.byteCountToDisplaySize(bytesUploaded.get())
+        println(s"Upload started for ${dir.getAbsolutePath}, ${toXfer} to go")
+
+
+        while (upload.getProgress.getPercentTransferred < 100)
+        {
+            val xfered = FileUtils.byteCountToDisplaySize( upload.getProgress.getBytesTransferred )
+            println(s"${upload.getProgress.getPercentTransferred}% done, $xfered / $toXfer")
+
+            Thread.sleep(1000)
+        }
+
 
         upload.waitForCompletion()
         println(s"Upload finished for ${dir.getAbsolutePath}")
