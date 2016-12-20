@@ -23,11 +23,12 @@ class S3Uploader(private val env: Environment) extends ObjectMetadataProvider
 
     def uploadDirectory(dir:File):Long =
     {
+        println(s"Starting upload for ${dir.getAbsolutePath}")
         val upload = transferer.uploadDirectory(env.config.dataBucket, dir.getName, dir, true, this)
 
         val bytesUploaded = new AtomicLong( upload.getProgress.getTotalBytesToTransfer )
         val toXfer = FileUtils.byteCountToDisplaySize(bytesUploaded.get())
-        println(s"Upload started for ${dir.getAbsolutePath}, ${toXfer} to go")
+        println(s"Upload started for ${dir.getAbsolutePath}, $toXfer to go")
 
 
         while (upload.getProgress.getPercentTransferred < 100)
