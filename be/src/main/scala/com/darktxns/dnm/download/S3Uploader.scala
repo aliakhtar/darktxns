@@ -34,7 +34,7 @@ class S3Uploader(private val env: Environment) extends ObjectMetadataProvider
         while (upload.getProgress.getPercentTransferred < 100)
         {
             val xfered = FileUtils.byteCountToDisplaySize( upload.getProgress.getBytesTransferred )
-            println(s"${upload.getProgress.getPercentTransferred}% done, $xfered / $toXfer")
+            println(s"${upload.getProgress.getPercentTransferred}% done, $xfered / $toXfer , ${dir.getName}")
 
             Thread.sleep(1000)
         }
