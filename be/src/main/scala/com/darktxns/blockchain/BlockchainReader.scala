@@ -12,16 +12,13 @@ import scala.util.control.Breaks._
 class BlockchainReader
 {
     val params = new MainNetParams
-    //val file = new File("/data/bootstrap.dat")
-    val file = new File(".bitcoin/blocks/blk00000.dat")
-    val file2 = new File(".bitcoin/blocks/blk00001.dat")
-    val file3 = new File(".bitcoin/blocks/blk00002.dat")
-    val files: util.ArrayList[File] = Lists.newArrayList(file, file2, file3)
+    val file = new File("/data/bootstrap.dat")
+    val files: util.ArrayList[File] = Lists.newArrayList(file)
 
-    println(s"Loading blockchain...., files: ${files.size()}")
+    println("Loading blockchain....")
     val loader = new BlockFileLoader(params, files)
 
-    for (i <- 0 to 2)
+    for (i <- 0 to 100000)
     {
         val block = loader.next()
 
