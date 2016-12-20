@@ -22,32 +22,37 @@ class BlockchainReader
     {
         val block = loader.next()
 
-        println(s"Got block # $i:  ${block.getHashAsString}, txns: ${block.getTransactions.size()}")
-
-        block.getTransactions.forEach(txn =>
+        if (block.getTransactions.size() > 1)
         {
-            println(s"Txn: ${txn.getHashAsString}, ${txn.getPurpose}, ${txn.getSigOpCount}")
-            println(s"Appears in: ${txn.getAppearsInHashes}")
-            txn.getInputs.forEach(i => println(s"Input: ${i.toString}"))
-            txn.getOutputs.forEach(o =>
+
+            println(s"Got block # $i:  ${block.getHashAsString}, txns: ${block.getTransactions.size()}")
+
+            block.getTransactions.forEach(txn =>
             {
-                println(s"Output: ${o.getValue}, ${o.getSpentBy}")
-                if (o.getScriptPubKey == null || o.getScriptPubKey.getChunks == null)
-                    break
+                println(s"Txn: ${txn.getHashAsString}, ${txn.getPurpose}, ${txn.getSigOpCount}")
+                println(s"Appears in: ${txn.getAppearsInHashes}")
 
-                if (o.getScriptPubKey.isSentToAddress || o.getScriptPubKey.isSentToP2SH)
-                    println(s"To: ${o.getScriptPubKey.getToAddress(params)}")
+                txn.getInputs.forEach(i => println(s"Input: ${i.toString}"))
+                txn.getOutputs.forEach(o =>
+                {
+                    println(s"Output: ${o.getValue}, ${o.getSpentBy}")
+                    if (o.getScriptPubKey == null || o.getScriptPubKey.getChunks == null)
+                        break
 
-                try
-                {
-                    println(s"from: ${o.getScriptPubKey.getFromAddress(params)}")
-                }
-                catch
-                {
-                    case e:Exception => println(e.toString)
-                }
-                println(s"Amount: ${o.getValue}")
+                    if (o.getScriptPubKey.isSentToAddress || o.getScriptPubKey.isSentToP2SH)
+                        println(s"To: ${o.getScriptPubKey.getToAddress(params)}")
+
+                    try
+                    {
+                        println(s"from: ${o.getScriptPubKey.getFromAddress(params)}")
+                    }
+                    catch
+                    {
+                        case e:Exception => println(e.toString)
+                    }
+                    println(s"Amount: ${o.getValue}")
+                })
             })
-        })
+        }
     }
 }
