@@ -38,7 +38,14 @@ class BlockchainReader
                 if (o.getScriptPubKey.isSentToAddress || o.getScriptPubKey.isSentToP2SH)
                     println(s"To: ${o.getScriptPubKey.getToAddress(params)}")
 
-                println(s"from: ${o.getScriptPubKey.getFromAddress(params)}")
+                try
+                {
+                    println(s"from: ${o.getScriptPubKey.getFromAddress(params)}")
+                }
+                catch
+                {
+                    case e:Exception => println(e.toString)
+                }
                 println(s"Amount: ${o.getValue}")
             })
         })
