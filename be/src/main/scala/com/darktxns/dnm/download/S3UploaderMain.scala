@@ -8,6 +8,8 @@ import com.darktxns.{Environment, Task}
 import org.apache.commons.io.FileUtils.byteCountToDisplaySize
 
 import scala.collection.mutable
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent._
 
 class S3UploaderMain(env:Environment, datasets: Traversable[Dataset]) extends Task
 {
@@ -25,8 +27,13 @@ class S3UploaderMain(env:Environment, datasets: Traversable[Dataset]) extends Ta
         datasets.flatMap(_.directories).foreach(upload)
     }
 
+    private def upload(directory: File): Unit =
+    {
+        Future( blocking( uploadBlocking(directory) ) )
+    }
 
-    private def upload(directory: File):Unit =
+
+    private def uploadBlocking(directory: File):Unit =
     {
         try
         {

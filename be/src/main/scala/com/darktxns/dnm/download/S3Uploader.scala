@@ -2,15 +2,16 @@ package com.darktxns.dnm.download
 
 import java.io.File
 import java.nio.file.{Files, Paths}
-import java.util.concurrent.atomic.AtomicLong
 
 import com.amazonaws.annotation.ThreadSafe
 import com.amazonaws.regions.{Region, Regions}
-import com.amazonaws.services.s3.model.ObjectMetadata
+import com.amazonaws.services.s3.model.{ObjectMetadata, PutObjectRequest}
 import com.amazonaws.services.s3.transfer._
 import com.amazonaws.services.s3.{AmazonS3Client, S3ClientOptions}
 import com.darktxns.Environment
 import org.apache.commons.io.FileUtils
+
+import scala.collection.mutable
 
 @ThreadSafe
 class S3Uploader(private val env: Environment) extends ObjectMetadataProvider
@@ -23,26 +24,44 @@ class S3Uploader(private val env: Environment) extends ObjectMetadataProvider
 
     def uploadDirectory(dir:File):Long =
     {
-        println(s"Starting upload for ${dir.getAbsolutePath}")
-        val upload = transferer.uploadDirectory(env.config.dataBucket, dir.getName, dir, true, this)
+        var uploaded = 0L
 
-        val bytesUploaded = new AtomicLong( upload.getProgress.getTotalBytesToTransfer )
-        val toXfer = FileUtils.byteCountToDisplaySize(bytesUploaded.get())
-        println(s"Upload started for ${dir.getAbsolutePath}, $toXfer to go")
+        var files = mutable.ListBuffer.empty[File]
+        val dirs = mutable.ListBuffer.empty[File]
 
-
-        while (upload.getProgress.getPercentTransferred < 100)
+        dir.listFiles().foreach(f =>
         {
-            val xfered = FileUtils.byteCountToDisplaySize( upload.getProgress.getBytesTransferred )
-            println(s"${upload.getProgress.getPercentTransferred}% done, $xfered / $toXfer , ${dir.getName}")
+            if (f.isDirectory)
+                dirs += f
+            else
+                files += f
+        })
 
-            Thread.sleep(1000)
-        }
+        println(s"Starting upload for ${dir.getAbsolutePath}, files: ${files.length} , dirs: ${dirs.length}")
+
+        uploaded += files.map(uploadFile).sum
+        uploaded += dirs.map(uploadDirectory).sum
+
+        uploaded
+    }
+
+    def uploadFile(file:File):Long =
+    {
+        val key = file.getAbsolutePath.replace("/data/raw", "")
+        val req = new PutObjectRequest(env.config.dataBucket, key, file)
+
+        provideObjectMetadata(file, req.getMetadata)
+
+        val upload = transferer.upload(req)
+
+        val fileSize = upload.getProgress.getTotalBytesToTransfer
+        val fileSizeFriendly = FileUtils.byteCountToDisplaySize(fileSize)
+        println(s"Upload started for ${file.getAbsolutePath} -> $key, $fileSizeFriendly to go")
 
 
         upload.waitForCompletion()
-        println(s"Upload finished for ${dir.getAbsolutePath}")
-        bytesUploaded.get()
+        println(s"Upload done for ${file.getAbsolutePath} -> $key")
+        fileSize
     }
 
 
