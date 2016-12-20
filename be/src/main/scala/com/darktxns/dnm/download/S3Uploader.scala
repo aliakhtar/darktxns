@@ -14,7 +14,7 @@ import org.apache.commons.io.FileUtils
 import scala.collection.mutable
 
 @ThreadSafe
-class S3Uploader(private val env: Environment) extends ObjectMetadataProvider
+class S3Uploader(private val env: Environment)
 {
     private val s3 = new AmazonS3Client(env.awsCreds)
     s3.setRegion(Region.getRegion(Regions.US_WEST_2))
@@ -49,8 +49,7 @@ class S3Uploader(private val env: Environment) extends ObjectMetadataProvider
     {
         val key = file.getAbsolutePath.replace("/data/raw", "")
         val req = new PutObjectRequest(env.config.dataBucket, key, file)
-
-        provideObjectMetadata(file, req.getMetadata)
+        req.setMetadata( metadata(file) )
 
         val upload = transferer.upload(req)
 
@@ -64,9 +63,12 @@ class S3Uploader(private val env: Environment) extends ObjectMetadataProvider
         fileSize
     }
 
-
-    override def provideObjectMetadata(file: File, metadata: ObjectMetadata): Unit =
+    private def metadata(file: File):ObjectMetadata =
     {
-         metadata.setContentType( Files.probeContentType( Paths.get(file.getAbsolutePath) ) )
+        val metadata = new ObjectMetadata()
+        metadata.setContentType( Files.probeContentType( Paths.get(file.getAbsolutePath) ) )
+
+        metadata
     }
+
 }
