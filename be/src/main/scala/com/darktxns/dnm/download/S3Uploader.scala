@@ -41,8 +41,6 @@ class S3Uploader(private val env: Environment)
                 files += f
         })
 
-        println(s"Starting upload for ${dir.getAbsolutePath}, files: ${files.length} , dirs: ${dirs.length}")
-
         uploaded += files.map(uploadFile).sum
         uploaded += dirs.map(uploadDirectory).sum
 
@@ -95,6 +93,6 @@ class S3Uploader(private val env: Environment)
         if (key.length > 63)
             key = key.substring(0, 63)
 
-
+        key
     }
 }
