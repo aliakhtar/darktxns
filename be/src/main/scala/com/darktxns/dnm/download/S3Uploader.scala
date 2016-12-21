@@ -1,6 +1,7 @@
 package com.darktxns.dnm.download
 
 import java.io.File
+import java.net.URLEncoder
 import java.nio.file.{Files, Paths}
 
 import com.amazonaws.annotation.ThreadSafe
@@ -9,6 +10,7 @@ import com.amazonaws.services.s3.model.{ObjectMetadata, PutObjectRequest}
 import com.amazonaws.services.s3.transfer._
 import com.amazonaws.services.s3.{AmazonS3Client, S3ClientOptions}
 import com.darktxns.Environment
+import com.google.common.base.Charsets
 import org.apache.commons.io.FileUtils
 
 import scala.collection.mutable
@@ -42,21 +44,19 @@ class S3Uploader(private val env: Environment)
         uploaded += files.map(uploadFile).sum
         uploaded += dirs.map(uploadDirectory).sum
 
+        println(s"Uploaded directory: ${dir.getAbsoluteFile}: ${FileUtils.byteCountToDisplaySize(uploaded)}")
         uploaded
     }
 
     def uploadFile(file:File):Long =
     {
-        val key = file.getAbsolutePath.replace("/data/raw", "")
+        val key = getKey(file)
         val req = new PutObjectRequest(env.config.dataBucket, key, file)
         req.setMetadata( metadata(file) )
 
         val upload = transferer.upload(req)
 
         val fileSize = upload.getProgress.getTotalBytesToTransfer
-        val fileSizeFriendly = FileUtils.byteCountToDisplaySize(fileSize)
-        println(s"Upload started for ${file.getAbsolutePath} -> $key, $fileSizeFriendly to go")
-
 
         upload.waitForCompletion()
         println(s"Upload done for ${file.getAbsolutePath} -> $key")
@@ -71,4 +71,17 @@ class S3Uploader(private val env: Environment)
         metadata
     }
 
+    private def getKey(file: File): String =
+    {
+        var key = file.getAbsolutePath.replace("/data/raw/", "")
+        key = key.replace(file.getName, URLEncoder.encode(file.getName, Charsets.UTF_8.name())
+        val parts = mutable.ArrayBuffer.empty[String]
+
+        key.split('/').foreach(s => parts += s)
+
+        if (parts(0) == parts(1))
+            parts.remove( 0 )
+
+        parts.mkString("/")
+    }
 }
