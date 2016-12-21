@@ -10,6 +10,7 @@ import com.amazonaws.services.s3.model.{ObjectMetadata, PutObjectRequest}
 import com.amazonaws.services.s3.transfer._
 import com.amazonaws.services.s3.{AmazonS3Client, S3ClientOptions}
 import com.darktxns.Environment
+import com.darktxns.dnm.dataset.Dataset
 import com.google.common.base.Charsets
 import org.apache.commons.io.FileUtils
 
@@ -73,14 +74,17 @@ class S3Uploader(private val env: Environment)
 
     private def getKey(file: File): String =
     {
-        var key = file.getAbsolutePath.replace("/data/raw/", "")
-        key = key.replace(file.getName, URLEncoder.encode(file.getName, Charsets.UTF_8.name()))
+        val key = file.getAbsolutePath.replace(Dataset.UNZIP_DIR, "")
         val parts = mutable.ArrayBuffer.empty[String]
 
         key.split('/').foreach(s => parts += s)
 
         if (parts(0) == parts(1))
             parts.remove( 0 )
+
+        val lastIndex = parts.length - 1
+
+        parts(lastIndex) = parts(lastIndex).replace(file.getName, URLEncoder.encode(file.getName, Charsets.UTF_8.name()))
 
         parts.mkString("/")
     }

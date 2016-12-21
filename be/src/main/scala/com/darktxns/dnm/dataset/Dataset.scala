@@ -8,8 +8,8 @@ object Dataset
 {
     /* The parsed links are just the file names, they are appended to the below dir to get the full download URL */
 
-    private val ARCHIVEORG_DOWNLOAD_DIR = "https://archive.org/download/dnmarchives/"
-    private val UNZIP_DIR = "raw/"
+    val ARCHIVEORG_DOWNLOAD_DIR = "https://archive.org/download/dnmarchives/"
+    val UNZIP_DIR = "/data/raw/"
     val EXTENSION = ".tar.xz"
 }
 
@@ -28,6 +28,8 @@ class Dataset(val fileName: String)
 
     val directories:Traversable[File] =
             new File( Dataset.UNZIP_DIR + fileName.replace(Dataset.EXTENSION, "") ).listFiles()
+
+    println(s"Dirs for $fileName : $directories")
 
     /**
       * Parses out the human readable market name from the fileName.
