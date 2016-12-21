@@ -1,8 +1,8 @@
 package com.darktxns.dnm.download
 
 import java.io.File
-import java.net.URLEncoder
 import java.nio.file.{Files, Paths}
+import java.util.concurrent.atomic.AtomicLong
 
 import com.amazonaws.annotation.ThreadSafe
 import com.amazonaws.regions.{Region, Regions}
@@ -11,8 +11,7 @@ import com.amazonaws.services.s3.transfer._
 import com.amazonaws.services.s3.{AmazonS3Client, S3ClientOptions}
 import com.darktxns.Environment
 import com.darktxns.dnm.dataset.Dataset
-import com.google.common.base.Charsets
-import org.apache.commons.io.FileUtils
+import org.apache.commons.io.FileUtils.byteCountToDisplaySize
 
 import scala.collection.mutable
 
@@ -24,6 +23,8 @@ class S3Uploader(private val env: Environment)
     s3.setS3ClientOptions(S3ClientOptions.builder().enableDualstack().setAccelerateModeEnabled(true).build())
 
     private val transferer = new TransferManager( s3 )
+
+    val totalUploaded = new AtomicLong(0)
 
     def uploadDirectory(dir:File):Long =
     {
@@ -45,7 +46,8 @@ class S3Uploader(private val env: Environment)
         uploaded += files.map(uploadFile).sum
         uploaded += dirs.map(uploadDirectory).sum
 
-        println(s"Uploaded directory: ${dir.getAbsoluteFile}: ${FileUtils.byteCountToDisplaySize(uploaded)}")
+        println(s"Uploaded directory: ${dir.getAbsoluteFile}: ${byteCountToDisplaySize(uploaded)}, " +
+            s"total: ${byteCountToDisplaySize(totalUploaded.get())}")
         uploaded
     }
 
@@ -55,13 +57,20 @@ class S3Uploader(private val env: Environment)
         val req = new PutObjectRequest(env.config.dataBucket, key, file)
         req.setMetadata( metadata(file) )
 
-        val upload = transferer.upload(req)
+        try
+        {
+            val upload = transferer.upload(req)
 
-        val fileSize = upload.getProgress.getTotalBytesToTransfer
+            val fileSize = upload.getProgress.getTotalBytesToTransfer
 
-        upload.waitForCompletion()
-        println(s"Upload done for ${file.getAbsolutePath} -> $key")
-        fileSize
+            upload.waitForCompletion()
+            totalUploaded.addAndGet( fileSize )
+            fileSize
+        }
+        catch
+        {
+            case e:Exception =>  e.printStackTrace(); 0
+        }
     }
 
     private def metadata(file: File):ObjectMetadata =
@@ -74,7 +83,7 @@ class S3Uploader(private val env: Environment)
 
     private def getKey(file: File): String =
     {
-        val key = file.getAbsolutePath.replace(Dataset.UNZIP_DIR, "")
+        var key = file.getAbsolutePath.replace(Dataset.UNZIP_DIR, "")
         val parts = mutable.ArrayBuffer.empty[String]
 
         key.split('/').foreach(s => parts += s)
@@ -82,10 +91,10 @@ class S3Uploader(private val env: Environment)
         if (parts(0) == parts(1))
             parts.remove( 0 )
 
-        val lastIndex = parts.length - 1
+        key = parts.mkString("/").replace(" ","-")
+        if (key.length > 63)
+            key = key.substring(0, 63)
 
-        parts(lastIndex) = parts(lastIndex).replace(file.getName, URLEncoder.encode(file.getName, Charsets.UTF_8.name()))
 
-        parts.mkString("/")
     }
 }

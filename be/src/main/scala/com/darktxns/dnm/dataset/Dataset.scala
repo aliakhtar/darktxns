@@ -29,8 +29,6 @@ class Dataset(val fileName: String)
     val directories:Traversable[File] =
             new File( Dataset.UNZIP_DIR + fileName.replace(Dataset.EXTENSION, "") ).listFiles()
 
-    println(s"Dirs for $fileName : $directories")
-
     /**
       * Parses out the human readable market name from the fileName.
       *

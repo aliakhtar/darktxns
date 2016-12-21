@@ -64,6 +64,6 @@ class S3UploaderMain(env:Environment, datasets: Traversable[Dataset]) extends Ta
     override def status(): String =
     {
         s"${done.get()} / ${total.get()} uploaded, ${failed.get()} failed, " +
-            s" ${byteCountToDisplaySize(bytesUploaded.get())} uploaded."
+            s" ${byteCountToDisplaySize(s3Uploader.totalUploaded.get())} uploaded."
     }
 }
