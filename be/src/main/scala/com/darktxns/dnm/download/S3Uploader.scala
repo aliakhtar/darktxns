@@ -74,7 +74,7 @@ class S3Uploader(private val env: Environment)
     private def getKey(file: File): String =
     {
         var key = file.getAbsolutePath.replace("/data/raw/", "")
-        key = key.replace(file.getName, URLEncoder.encode(file.getName, Charsets.UTF_8.name())
+        key = key.replace(file.getName, URLEncoder.encode(file.getName, Charsets.UTF_8.name()))
         val parts = mutable.ArrayBuffer.empty[String]
 
         key.split('/').foreach(s => parts += s)
